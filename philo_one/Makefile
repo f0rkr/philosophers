@@ -6,23 +6,24 @@
 #    By: mashad <mashad@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/27 06:28:55 by mashad            #+#    #+#              #
-#    Updated: 2021/04/27 07:27:20 by mashad           ###   ########.fr        #
+#    Updated: 2021/06/25 17:53:28 by mashad           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME=philo_one
+NAME=philo
 CC=gcc
-THREADSFLAGS=-lthread
+THREADSFLAGS=-pthread
+DEBUG=-g
 FLAGS=-Wall -Werror -Wextra
 RM=rm -rf
 INCLUDES= includes
-SRCS= srcs/philo_one.c
+SRCS= srcs/philo.c srcs/philo_utils.c
 
-all: $(NAME):
+all: $(NAME)
 	@echo "Compiling code..."
 
 $(NAME): $(SRCS)
-	@$(CC) $(FLAGS) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
+	$(CC) $(FLAGS) $(DEBUG) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
 
 clean:
 	@$(RM) *.o

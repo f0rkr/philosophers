@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_one.h                                        :+:      :+:    :+:   */
+/*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 06:55:20 by mashad            #+#    #+#             */
-/*   Updated: 2021/05/06 16:39:32 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/25 18:39:10 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,29 +32,29 @@
 # define STDERR 2
 # define ERROR  -1
 
-typedef struct s_din_game
-{
-	t_philosopher	**t_philoso;
-	int				nb_philosopher;
-
-}				t_game;
-
-typedef struct s_fork
-{
-
-}				t_fork;
-
 typedef struct s_philosopher
 {
-	int		philo_id;
-	int		time_to_die;
-	int		time_to_eat;
-	int		time_to_sleep;
-	int		number_of_times_each_philosopher_must_eat;
-	t_fork	*f_fork;
-	t_fork	*s_fork;
-	pthread	philo_thd;
+	int					philo_id;
+	pthread_t			f_fork;
+	pthread_t			s_fork;
+	pthread_t			philo_thd;
+	struct	s_din_table	din_table;
 }				t_philosopher;
 
+typedef struct s_din_table
+{
+	t_philosopher	**t_philoso;
+	pthread_mutex_t	t_mutex;
+	pthread_t		**t_forks;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				number_of_times_each_philosopher_must_eat;
+	int				nb_philosopher;
+	int				inc_philo;
+}				t_table;
 
+
+size_t	ft_strlen(const char *str);
+int		ft_atoi(const char *str);
 #endif
