@@ -1,6 +1,6 @@
 # philophers
 
-<img src="https://movemequotes.com/wp-content/uploads/2013/11/IMG_8550-930x620.jpg">
+<img src="https://www.antonioskoletsas.com/wp-content/uploads/2021/02/40ab88f0-og-socrates.ngsversion.1558373552160.adapt_.1900.1.jpg">
 
 the dining philosophers problem is an example problem often used in concurrent algorithm design to illustrate synchronization issues and techniques for resolving them.
 
