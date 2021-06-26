@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 06:55:20 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/25 18:39:10 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/25 21:06:03 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ typedef struct s_philosopher
 	pthread_t			f_fork;
 	pthread_t			s_fork;
 	pthread_t			philo_thd;
-	struct	s_din_table	din_table;
 }				t_philosopher;
 
 typedef struct s_din_table
@@ -55,6 +54,8 @@ typedef struct s_din_table
 }				t_table;
 
 
-size_t	ft_strlen(const char *str);
-int		ft_atoi(const char *str);
+size_t			ft_strlen(const char *str);
+int				ft_atoi(const char *str);
+t_table			*init_table(int argc, char **argv);
+t_philosopher	*init_philo( void );
 #endif
