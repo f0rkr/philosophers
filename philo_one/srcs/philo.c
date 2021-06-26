@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/26 01:51:56 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/26 17:14:48 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,12 @@ void	*philosopher_routine(void *data)
 	t_table *din_table;
 
 	din_table = (t_table *) data;
-	pthread_mutex_lock(&din_table->t_mutex);
-	printf("%d is philo pid\n", din_table->t_philoso[din_table->inc_philo]->philo_id + 1);
-	printf("%d is ending\n", din_table->t_philoso[din_table->inc_philo++]->philo_id + 1);
-	pthread_mutex_unlock(&din_table->t_mutex);
+	while (1)
+	{
+		p_eat(din_table);
+		p_think(din_table);
+		p_sleep(din_table);
+	}
 	usleep(100);
 	return (NULL);
 }
@@ -68,7 +70,8 @@ int	dining_init(int argc, char **argv)
 		p_counter++;
 		usleep(100);
 	}
-	pthread_mutex_destroy(&din_table->t_mutex);
+	kami_visor(din_table);
+	din_destroy(&din_table);
 	return (EXIT_SUCCESS);
 }
 

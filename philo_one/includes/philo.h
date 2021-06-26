@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 06:55:20 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/25 21:06:03 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/26 17:13:15 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,8 @@ size_t			ft_strlen(const char *str);
 int				ft_atoi(const char *str);
 t_table			*init_table(int argc, char **argv);
 t_philosopher	*init_philo( void );
+void    p_eat(t_table *din_table);
+void    p_think(t_table *din_table);
+void    p_sleep(t_table *din_table);
+void    kami_visor(t_table *din_table);
 #endif
