@@ -6,30 +6,28 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/26 17:14:48 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/27 18:08:38 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/*
+** CHECKING FOR ARG ERRORS AND VALIDITY
+** Before run time
+*/
 int	check_arg_errors(int argc, char **argv)
 {
 	(void) argv;
-	if (argc <= 1 || argc != 5 || argc > 6)
+	if (argc <= 1 || argc > 6)
 		return (ERROR);
-	write(1, "success\n", ft_strlen("success\n"));
 	return (EXIT_SUCCESS);
 }
 
-/*
-** ALLOCATING AND INITIALIZING MAIN DINING TABLE STRUCTURE
-** IN CASE OF FAIL RETURN NULL
-** OTHERWISE IT RETURNS ADDRESS OF THE DINING TABLE STRUCTURE
-*/
 
 void	din_destroy(t_table **din_table)
 {
-	pthread_mutex_destroy(&(*din_table)->t_mutex);
+	pthread_mutex_destroy(&(*din_table)->write_mutex);
 	return ;
 }
 
@@ -38,16 +36,18 @@ void	din_destroy(t_table **din_table)
 */
 void	*philosopher_routine(void *data)
 {
-	t_table *din_table;
+	t_philosopher *philo;
 
-	din_table = (t_table *) data;
+	philo = (t_philosopher *) data;
+	philo->last_time_eat = timeInMilliseconds();
+	philo->din_table->p_time = timeInMilliseconds();
 	while (1)
 	{
-		p_eat(din_table);
-		p_think(din_table);
-		p_sleep(din_table);
+		p_eat(philo);
+		p_sleep(philo);
+		p_think(philo);
+		usleep(100);
 	}
-	usleep(100);
 	return (NULL);
 }
 
@@ -65,7 +65,7 @@ int	dining_init(int argc, char **argv)
 		return (ERROR);
 	while (p_counter < din_table->nb_philosopher)
 	{
-		if (pthread_create(&(din_table->t_philoso[p_counter]->philo_thd), NULL, &philosopher_routine, din_table) != 0)
+		if (pthread_create(&(din_table->t_philoso[p_counter]->philo_thd), NULL, &philosopher_routine, din_table->t_philoso[p_counter]) != 0)
 			return (ERROR);
 		p_counter++;
 		usleep(100);

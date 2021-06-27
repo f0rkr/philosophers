@@ -6,7 +6,7 @@
 #    By: mashad <mashad@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/27 06:28:55 by mashad            #+#    #+#              #
-#    Updated: 2021/06/26 01:49:15 by mashad           ###   ########.fr        #
+#    Updated: 2021/06/26 17:16:59 by mashad           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SANITIZE=-fsanitize=address
 FLAGS=-Wall -Werror -Wextra
 RM=rm -rf
 INCLUDES= includes
-SRCS= srcs/philo.c srcs/philo_utils.c
+SRCS= srcs/philo.c srcs/philo_utils.c srcs/routine_utils.c
 
 
 all: $(NAME)
