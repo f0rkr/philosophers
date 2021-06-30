@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 06:55:20 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/28 15:36:40 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/30 16:36:43 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_philosopher
 	int					num_time_eat;
 	long long			last_time_eat;
 	int					is_eating;
+	int					time_ate;
 	struct s_din_table	*din_table;
 }				t_philosopher;
 
@@ -52,6 +53,7 @@ typedef struct s_din_table
 	pthread_mutex_t	*t_forks;
 	int				time_to_die;
 	int				time_to_eat;
+	int				death;
 	int				time_to_sleep;
 	int				number_of_times_each_philosopher_must_eat;
 	int				nb_philosopher;

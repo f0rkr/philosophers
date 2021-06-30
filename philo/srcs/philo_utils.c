@@ -6,22 +6,11 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:26:59 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/28 15:41:54 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/30 16:36:53 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-void	p_print_status(int philo_status)
-{
-	if (philo_status == SLEEPING)
-		printf("X is Sleeping.\n");
-	else if (philo_status == EATING)
-		printf("X is Eating.\n");
-	else if (philo_status == THINKING)
-		printf("X is Thinking.\n");
-	return ;
-}
 
 /*
 ** ALLOCATING N PHILOSOPHER INTO A DOUBLE POINTER
@@ -45,6 +34,7 @@ t_philosopher	**init_philo(t_table *din_table)
 		if (!philosopher[philo_count])
 			return (NULL);
 		philosopher[philo_count]->din_table = din_table;
+		philosopher[philo_count]->time_ate = 0;
 		philosopher[philo_count]->num_time_eat = 0;
 		philosopher[philo_count]->is_eating = 0;
 		philosopher[philo_count]->philo_id = philo_count;
@@ -75,6 +65,7 @@ t_table	*init_table(int argc, char **argv)
 	din_table->time_to_die = ft_atoi(argv[2]);
 	din_table->time_to_eat = ft_atoi(argv[3]);
 	din_table->time_to_sleep = ft_atoi(argv[4]);
+	din_table->death = 0;
 	din_table->t_forks = (pthread_mutex_t *)
 		malloc(sizeof(pthread_mutex_t) * din_table->nb_philosopher);
 	while (philo_count < din_table->nb_philosopher)

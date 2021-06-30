@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/28 19:45:07 by mashad           ###   ########.fr       */
+/*   Updated: 2021/06/30 19:21:00 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,32 @@
 int	check_arg_errors(int argc, char **argv)
 {
 	(void) argv;
-	if (argc <= 1 || argc > 6)
+	if (argc < 5 || argc > 6)
 		return (ERROR);
 	return (EXIT_SUCCESS);
 }
 
-void	din_destroy(t_table **din_table)
+void	din_destroy(t_table **din)
 {
-	pthread_mutex_destroy(&(*din_table)->write_mutex);
+	int	philo_count;
+	t_table *din_table;
+
+	din_table = *din;
+	philo_count = 0;
+	pthread_mutex_destroy(&din_table->write_mutex);
+	while (philo_count < din_table->nb_philosopher)
+	{
+		free(din_table->t_philoso[philo_count]);
+		din_table->t_philoso[philo_count] = NULL;
+		pthread_mutex_destroy(&din_table->t_forks[philo_count]);
+		philo_count++;
+	}
+	free(din_table->t_philoso);
+	din_table->t_philoso = NULL;
+	free(din_table->t_forks);
+	din_table->t_forks = NULL;
+	free(*din);
+	*din = NULL;
 	return ;
 }
 
@@ -40,7 +58,7 @@ void	*philosopher_routine(void *data)
 	philo = (t_philosopher *) data;
 	philo->last_time_eat = timeInMilliseconds();
 	philo->din_table->p_time = timeInMilliseconds();
-	while (philo->din_table->number_of_times_each_philosopher_must_eat != 0)
+	while (philo->din_table->death != 1)
 	{
 		p_eat(philo);
 		p_sleep(philo);
@@ -71,6 +89,8 @@ int	dining_init(int argc, char **argv)
 		usleep(100);
 	}
 	kami_visor(din_table);
+	p_counter = 0;
+	usleep(din_table->time_to_eat * 1000);
 	din_destroy(&din_table);
 	return (EXIT_SUCCESS);
 }
