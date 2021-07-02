@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/30 19:21:00 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/02 15:18:10 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	din_destroy(t_table **din)
 
 	din_table = *din;
 	philo_count = 0;
-	pthread_mutex_destroy(&din_table->write_mutex);
 	while (philo_count < din_table->nb_philosopher)
 	{
 		free(din_table->t_philoso[philo_count]);
@@ -39,6 +38,7 @@ void	din_destroy(t_table **din)
 		pthread_mutex_destroy(&din_table->t_forks[philo_count]);
 		philo_count++;
 	}
+	pthread_mutex_destroy(&din_table->write_mutex);
 	free(din_table->t_philoso);
 	din_table->t_philoso = NULL;
 	free(din_table->t_forks);
@@ -89,8 +89,7 @@ int	dining_init(int argc, char **argv)
 		usleep(100);
 	}
 	kami_visor(din_table);
-	p_counter = 0;
-	usleep(din_table->time_to_eat * 1000);
+	usleep(200000);
 	din_destroy(&din_table);
 	return (EXIT_SUCCESS);
 }

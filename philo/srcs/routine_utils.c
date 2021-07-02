@@ -59,6 +59,12 @@ extern void	kami_visor(t_table *din_table)
 	while (!din_table->death)
 	{
 		i = 0;
+		if (din_table->t_philoso[din_table->nb_philosopher - 1]->time_ate == din_table->number_of_times_each_philosopher_must_eat)
+		{
+			din_table->death = 1;
+			pthread_mutex_lock(&din_table->write_mutex);
+			return ;
+		}
 		while (i < din_table->nb_philosopher)
 		{
 			if ((timeInMilliseconds()
@@ -71,11 +77,6 @@ extern void	kami_visor(t_table *din_table)
 					din_table->t_philoso[i]->philo_id + 1, "is dead\n",
 					din_table);
 				pthread_mutex_lock(&din_table->write_mutex);
-				return ;
-			}
-			if (din_table->t_philoso[din_table->nb_philosopher - 1]->time_ate == din_table->number_of_times_each_philosopher_must_eat)
-			{
-				din_table->death = 1;	
 				return ;
 			}
 			i++;

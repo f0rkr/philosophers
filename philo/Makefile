@@ -6,7 +6,7 @@
 #    By: mashad <mashad@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/27 06:28:55 by mashad            #+#    #+#              #
-#    Updated: 2021/06/30 19:21:18 by mashad           ###   ########.fr        #
+#    Updated: 2021/07/01 14:54:50 by mashad           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ all: $(NAME)
 	@echo "Compiling code..."
 
 $(NAME): $(SRCS)
-	$(CC) $(FLAGS) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
+	$(CC) $(FLAGS) $(SANITIZE) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
 
 clean:
 	@$(RM) *.o
