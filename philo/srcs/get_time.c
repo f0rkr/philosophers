@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/28 19:40:04 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/28 19:40:17 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/09 16:04:20 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,4 +18,22 @@ extern long long	timeInMilliseconds(void)
 
 	gettimeofday(&tv, NULL);
 	return ((((long long) tv.tv_sec) * 1000) + (tv.tv_usec / 1000));
+}
+
+extern	int	ft_isdigit(int c)
+{
+	if (c >= 48 && c <= 57)
+		return (1);
+	return (0);
+}
+
+extern int	check_eat_time(t_table *din_table)
+{
+	if (din_table->t_philoso[din_table->nb_philosopher - 1]->time_ate
+		== din_table->number_of_times_each_philosopher_must_eat)
+	{
+		din_table->death = 1;
+		return (1);
+	}
+	return (0);
 }

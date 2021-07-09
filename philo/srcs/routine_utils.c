@@ -5,7 +5,8 @@ extern void	print_status(long long time, int id,
 {
 	pthread_mutex_lock(&din_table->write_mutex);
 	printf("%lld %d %s", time, id, string);
-	pthread_mutex_unlock(&din_table->write_mutex);
+	if (strcmp(string, "is dead\n") != 0)
+		pthread_mutex_unlock(&din_table->write_mutex);
 }
 
 extern void	p_eat(t_philosopher *philo)
@@ -59,12 +60,8 @@ extern void	kami_visor(t_table *din_table)
 	while (!din_table->death)
 	{
 		i = 0;
-		if (din_table->t_philoso[din_table->nb_philosopher - 1]->time_ate == din_table->number_of_times_each_philosopher_must_eat)
-		{
-			din_table->death = 1;
-			pthread_mutex_lock(&din_table->write_mutex);
+		if (check_eat_time(din_table))
 			return ;
-		}
 		while (i < din_table->nb_philosopher)
 		{
 			if ((timeInMilliseconds()
@@ -72,11 +69,10 @@ extern void	kami_visor(t_table *din_table)
 				>= din_table->time_to_die
 				&& !din_table->t_philoso[i]->is_eating)
 			{
-				din_table->death = 1;
 				print_status(timeInMilliseconds() - din_table->p_time,
 					din_table->t_philoso[i]->philo_id + 1, "is dead\n",
 					din_table);
-				pthread_mutex_lock(&din_table->write_mutex);
+				din_table->death = 1;
 				return ;
 			}
 			i++;

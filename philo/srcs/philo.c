@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/07/02 15:18:10 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/06 19:08:43 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,28 @@
 */
 int	check_arg_errors(int argc, char **argv)
 {
-	(void) argv;
+	int	counter;
+
+	counter = 1;
 	if (argc < 5 || argc > 6)
 		return (ERROR);
+	while (counter < argc)
+	{
+		if (!ft_isdigit(argv[counter][0]))
+			return (ERROR);
+		counter++;
+	}
 	return (EXIT_SUCCESS);
 }
 
 void	din_destroy(t_table **din)
 {
-	int	philo_count;
-	t_table *din_table;
+	int		philo_count;
+	t_table	*din_table;
 
 	din_table = *din;
 	philo_count = 0;
+	usleep(200000);
 	while (philo_count < din_table->nb_philosopher)
 	{
 		free(din_table->t_philoso[philo_count]);
@@ -89,7 +98,6 @@ int	dining_init(int argc, char **argv)
 		usleep(100);
 	}
 	kami_visor(din_table);
-	usleep(200000);
 	din_destroy(&din_table);
 	return (EXIT_SUCCESS);
 }
@@ -97,7 +105,10 @@ int	dining_init(int argc, char **argv)
 int	main(int argc, char **argv)
 {
 	if (check_arg_errors(argc, argv) == ERROR)
+	{
+		printf("Error: Bad arguments.\n");
 		return (ERROR);
+	}
 	if (dining_init(argc, argv) == ERROR)
 		return (ERROR);
 	return (EXIT_SUCCESS);

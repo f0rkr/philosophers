@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 06:55:20 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/30 16:36:43 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/06 16:23:30 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,5 +70,5 @@ void			p_think(t_philosopher *philo);
 void			p_sleep(t_philosopher *philo);
 void			kami_visor(t_table *din_table);
 long long		timeInMilliseconds(void);
-
+int				ft_isdigit(int c);
 #endif
