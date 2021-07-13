@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:26:59 by mashad            #+#    #+#             */
-/*   Updated: 2021/06/30 16:36:53 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/13 17:12:38 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ t_philosopher	**init_philo(t_table *din_table)
 		philosopher[philo_count]->is_eating = 0;
 		philosopher[philo_count]->philo_id = philo_count;
 		philosopher[philo_count]->l_fork = philo_count;
-		philosopher[philo_count]->r_fork = philo_count + 1
+		philosopher[philo_count]->r_fork = (philo_count + 1)
 			% din_table->nb_philosopher;
 		philo_count++;
 	}

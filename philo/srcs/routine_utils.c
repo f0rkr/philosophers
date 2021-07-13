@@ -1,10 +1,10 @@
 #include "philo.h"
 
-extern void	print_status(long long time, int id,
+extern void	print_status(int id,
 	char *string, t_table *din_table)
 {
 	pthread_mutex_lock(&din_table->write_mutex);
-	printf("%lld %d %s", time, id, string);
+	printf("%lld %d %s", timeInMilliseconds() - din_table->p_time, id, string);
 	if (strcmp(string, "is dead\n") != 0)
 		pthread_mutex_unlock(&din_table->write_mutex);
 }
@@ -12,17 +12,12 @@ extern void	print_status(long long time, int id,
 extern void	p_eat(t_philosopher *philo)
 {
 	pthread_mutex_lock(&philo->din_table->t_forks[philo->l_fork]);
-	print_status(timeInMilliseconds() - philo->din_table->p_time,
-		philo->philo_id + 1, "has taken a fork\n",
-		philo->din_table);
+	print_status(philo->philo_id + 1, "has taken a fork\n", philo->din_table);
 	pthread_mutex_lock(&philo->din_table->t_forks[philo->r_fork]);
-	print_status(timeInMilliseconds() - philo->din_table->p_time,
-		philo->philo_id + 1, "has taken a fork\n",
-		philo->din_table);
-	print_status(timeInMilliseconds() - philo->din_table->p_time,
-		philo->philo_id + 1, "is eating\n", philo->din_table);
-	philo->last_time_eat = timeInMilliseconds();
+	print_status(philo->philo_id + 1, "has taken a fork\n", philo->din_table);
+	print_status(philo->philo_id + 1, "is eating\n", philo->din_table);
 	philo->is_eating = 1;
+	philo->last_time_eat = timeInMilliseconds();
 	usleep(philo->din_table->time_to_eat * 1000 - 14000);
 	while (timeInMilliseconds() - philo->last_time_eat
 		< philo->din_table->time_to_eat);
@@ -35,8 +30,7 @@ extern void	p_eat(t_philosopher *philo)
 
 extern void	p_think(t_philosopher *philo)
 {
-	print_status(timeInMilliseconds() - philo->din_table->p_time,
-		philo->philo_id + 1, "is thinking\n", philo->din_table);
+	print_status(philo->philo_id + 1, "is thinking\n", philo->din_table);
 	return ;
 }
 
@@ -44,8 +38,7 @@ extern void	p_sleep(t_philosopher *philo)
 {
 	long long	time;
 
-	print_status(timeInMilliseconds() - philo->din_table->p_time,
-		philo->philo_id + 1, "is sleping\n", philo->din_table);
+	print_status(philo->philo_id + 1, "is sleping\n", philo->din_table);
 	time = timeInMilliseconds();
 	usleep(philo->din_table->time_to_sleep * 1000 - 14000);
 	while (timeInMilliseconds() - time
@@ -69,9 +62,8 @@ extern void	kami_visor(t_table *din_table)
 				>= din_table->time_to_die
 				&& !din_table->t_philoso[i]->is_eating)
 			{
-				print_status(timeInMilliseconds() - din_table->p_time,
-					din_table->t_philoso[i]->philo_id + 1, "is dead\n",
-					din_table);
+				print_status(din_table->t_philoso[i]->philo_id + 1,
+					"is dead\n", din_table);
 				din_table->death = 1;
 				return ;
 			}

@@ -6,7 +6,7 @@
 #    By: mashad <mashad@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/27 06:28:55 by mashad            #+#    #+#              #
-#    Updated: 2021/07/01 14:54:50 by mashad           ###   ########.fr        #
+#    Updated: 2021/07/13 18:58:17 by mashad           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,10 +22,9 @@ SRCS= srcs/philo.c srcs/get_time.c srcs/philo_utils.c srcs/routine_utils.c
 
 
 all: $(NAME)
-	@echo "Compiling code..."
 
 $(NAME): $(SRCS)
-	$(CC) $(FLAGS) $(SANITIZE) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
+	$(CC) $(FLAGS) $(THREADSFLAGS) $(SRCS) -I $(INCLUDES) -o $(NAME)
 
 clean:
 	@$(RM) *.o

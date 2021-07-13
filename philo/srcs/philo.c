@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/27 07:03:14 by mashad            #+#    #+#             */
-/*   Updated: 2021/07/06 19:08:43 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/13 18:38:48 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	check_arg_errors(int argc, char **argv)
 		return (ERROR);
 	while (counter < argc)
 	{
-		if (!ft_isdigit(argv[counter][0]))
+		if (!str_isdigit(argv[counter]))
 			return (ERROR);
 		counter++;
 	}
@@ -39,7 +39,6 @@ void	din_destroy(t_table **din)
 
 	din_table = *din;
 	philo_count = 0;
-	usleep(200000);
 	while (philo_count < din_table->nb_philosopher)
 	{
 		free(din_table->t_philoso[philo_count]);
@@ -66,13 +65,11 @@ void	*philosopher_routine(void *data)
 
 	philo = (t_philosopher *) data;
 	philo->last_time_eat = timeInMilliseconds();
-	philo->din_table->p_time = timeInMilliseconds();
 	while (philo->din_table->death != 1)
 	{
 		p_eat(philo);
 		p_sleep(philo);
 		p_think(philo);
-		usleep(100);
 	}
 	return (NULL);
 }
@@ -89,6 +86,7 @@ int	dining_init(int argc, char **argv)
 	din_table = init_table(argc, argv);
 	if (!din_table)
 		return (ERROR);
+	din_table->p_time = timeInMilliseconds();
 	while (p_counter < din_table->nb_philosopher)
 	{
 		if (pthread_create(&(din_table->t_philoso[p_counter]->philo_thd), NULL,
@@ -109,6 +107,8 @@ int	main(int argc, char **argv)
 		printf("Error: Bad arguments.\n");
 		return (ERROR);
 	}
+	if (argv[1][0] == '0')
+		return (ERROR);
 	if (dining_init(argc, argv) == ERROR)
 		return (ERROR);
 	return (EXIT_SUCCESS);

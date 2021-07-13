@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/28 19:40:04 by mashad            #+#    #+#             */
-/*   Updated: 2021/07/09 16:04:20 by mashad           ###   ########.fr       */
+/*   Updated: 2021/07/13 18:38:37 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,4 +36,18 @@ extern int	check_eat_time(t_table *din_table)
 		return (1);
 	}
 	return (0);
+}
+
+extern	int	str_isdigit(char *string)
+{
+	int	p_count;
+
+	p_count = 0;
+	while (string[p_count] != '\0')
+	{
+		if (!ft_isdigit(string[p_count]))
+			return (0);
+		p_count++;
+	}
+	return (1);
 }
