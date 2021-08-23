@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 10:24:51 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 00:20:57 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/23 10:03:58 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ void    print_status(t_din  *din_table, int pid, char *string)
 */
 void  eat_routine(t_philo *philo)
 {
-  long long time;
-
   pthread_mutex_lock(&philo->din_table->forks[philo->lf]);
   print_status(philo->din_table, philo->pid, "taken left fork\n");
   pthread_mutex_lock(&philo->din_table->forks[philo->rf]);
@@ -39,9 +37,7 @@ void  eat_routine(t_philo *philo)
   philo->eating = 1;
   philo->lta = ft_time_in_ms();
   print_status(philo->din_table, philo->pid, "is eating\n");
-  time = ft_time_in_ms();
-  usleep(philo->din_table->tte * 1000 - 8000);
-  while (ft_time_in_ms() - time < philo->din_table->tte);
+  usleep(philo->din_table->tte * 1000);
   philo->nta++;
   pthread_mutex_unlock(&philo->din_table->forks[philo->lf]);
   pthread_mutex_unlock(&philo->din_table->forks[philo->rf]);
@@ -54,12 +50,8 @@ void  eat_routine(t_philo *philo)
 */
 void  sleep_routine(t_philo *philo)
 {
-  long long time;
-
   print_status(philo->din_table, philo->pid, "is sleeping\n");
-  time = ft_time_in_ms();
-  usleep(philo->din_table->tts * 1000 - 8000);
-  while (ft_time_in_ms() - time < philo->din_table->tts);
+  usleep(philo->din_table->tts * 1000);
   return ;
 }
 

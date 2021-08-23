@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/18 16:38:13 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 08:24:42 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/23 10:12:31 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,31 +74,24 @@ t_din		*fill_table(int argSize, char **args)
 ** Mr mayhem check for a reason to kill
 ** one of the philospher either their
 ** time to die or number_of_times_each_philosopher_must_eat
+** Each philosopher has it's own death master
 */
-void 	mr_mayhem(t_din	*din_table)
+void 	*mr_mayhem(void	*data)
 {
-	int	i;
+	t_philo *philo;
 
-	while (din_table->death)
+	philo = (t_philo *)data;
+	while (philo->din_table->death)
 	{
-			i = 0;
-			if (din_table->philos[din_table->nop - 1]->nta == din_table->ntpme)
+			if (!philo->eating && ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
 			{
-					din_table->death = 0;
-					break ;
+				print_status(philo->din_table, philo->pid, "died\n");
+				philo->din_table->death = 0;
 			}
-			while (i < din_table->nop)
-			{
-				if (ft_time_in_ms() - din_table->philos[i]->lta >= din_table->ttd)
-				{
-					print_status(din_table, din_table->philos[i]->pid, "died\n");
-					din_table->death = 0;
-					break ;
-				}
-				i++;
-			}
+			if (philo->din_table->philos[philo->din_table->nop - 1]->nta == philo->din_table->ntpme)
+					philo->din_table->death = 0;
 	}
-	return ;
+	return (NULL);
 }
 
 /*
@@ -107,8 +100,12 @@ void 	mr_mayhem(t_din	*din_table)
 int			start_threads(t_din	*din_table)
 {
 	int i;
+	pthread_t *myhem;
 
 	i = 0;
+	myhem = (pthread_t *)malloc(sizeof(pthread_t) * din_table->nop);
+	if (myhem == NULL)
+		return (ERROR);
 	din_table->st = ft_time_in_ms();
 	while (i < din_table->nop)
 	{
@@ -118,7 +115,22 @@ int			start_threads(t_din	*din_table)
 		i++;
 		usleep(100);
 	}
-	mr_mayhem(din_table);
+	i = 0;
+	while (i < din_table->nop)
+	{
+		if (pthread_create(&myhem[i], NULL, &mr_mayhem,
+			(void *)din_table->philos[i]) != 0)
+				return (ERROR);
+		i++;
+	}
+	i = 0;
+	while (din_table->death);
+	while (i < din_table->nop)
+	{
+		if (pthread_detach(din_table->philos[i]->thd_philo) != 0)
+				return (ERROR);
+		i++;
+	}
 	return (GOOD);
 }
 
