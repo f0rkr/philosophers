@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 09:26:02 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 08:50:37 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/25 08:27:51 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,28 +95,31 @@ t_philo   **initialize_philosphers(t_din *din_table)
     philos[i]->din_table = din_table;
     philos[i]->pid = i;
     philos[i]->nta = 0;
-    philos[i]->lf = i;
     philos[i]->eating = 0;
-    philos[i]->rf = (i + 1) % philos[i]->din_table->nop;
     i++;
   }
   return (philos);
 }
 
-pthread_mutex_t   *initialize_forks(t_din *din_table)
+/*
+** Initialize forks semaphores
+*/
+int 	initialize_sems(t_din *din_table)
 {
-  pthread_mutex_t *forks;
-  int             i;
-
-  i = 0;
-  forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * din_table->nop);
-  if (forks == NULL)
-    return (NULL);
-  while (i < din_table->nop)
-  {
-    if (pthread_mutex_init(&forks[i], 0) != 0)
-      return (NULL);
-    i++;
-  }
-  return (forks);
+	sem_unlink("forking");
+  din_table->forks = sem_open("forking", O_CREAT, S_PERM, din_table->nop);
+  if (din_table->forks == SEM_FAILED)
+    return (ERROR);
+	sem_unlink("death");
+	din_table->death = sem_open("death", O_CREAT, 0644, 1);
+	if (din_table->death == SEM_FAILED)
+		return (ERROR);
+	sem_unlink("writing");
+	din_table->write = sem_open("writing", O_CREAT, 0644, 1);
+	if (din_table->write == SEM_FAILED)
+		return (ERROR);
+	din_table->myhem = (pthread_t *)malloc(sizeof(pthread_t) * din_table->nop);
+	if (din_table->myhem == NULL)
+		return (ERROR);
+  return (GOOD);
 }

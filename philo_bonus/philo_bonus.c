@@ -6,11 +6,11 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/18 16:38:13 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 10:11:06 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/25 08:50:04 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 /*
 ** Mainly check arguments validity and return acceptance
@@ -50,22 +50,18 @@ t_din		*fill_table(int argSize, char **args)
 	din_table->tte = ft_atoi(args[counter++]);
 	din_table->tts = ft_atoi(args[counter++]);
 	din_table->ntpme = -1;
-	din_table->death = 1;
 	if (argSize - 1 == 5)
 		din_table->ntpme = ft_atoi(args[counter]);
 	if (din_table->nop == OFLOW || din_table->ttd == OFLOW || din_table->tte == OFLOW || din_table->tts == OFLOW ||
 		din_table->ntpme == OFLOW)
 	{
-		write(2, "Error: Invalid Argument\n", 23);
+		write(2, "Error: Argument overflow\n", 23);
 		return (NULL);
 	}
-	din_table->forks = initialize_forks(din_table);
-	if (din_table->forks == NULL)
+	if (initialize_sems(din_table) != GOOD)
 		return (NULL);
 	din_table->philos = initialize_philosphers(din_table);
 	if (din_table->philos == NULL || din_table->nop == 0)
-		return (NULL);
-	if (pthread_mutex_init(&din_table->write, 0) != 0)
 		return (NULL);
 	return (din_table);
 }
@@ -80,17 +76,39 @@ void 	*mr_mayhem(void	*data)
 	t_philo *philo;
 
 	philo = (t_philo *)data;
-	while (philo->din_table->death)
+	usleep(3000);
+	while (1)
 	{
-			if (!philo->eating && ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
+			if (ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
 			{
 				print_status(philo->din_table, philo->pid, "died\n");
-				philo->din_table->death = 0;
+				exit(1);
 			}
-			if (philo->din_table->philos[philo->din_table->nop - 1]->nta == philo->din_table->ntpme)
-					philo->din_table->death = 0;
 	}
 	return (NULL);
+}
+
+/*
+** Await for child to finish
+** Then automatically kill them
+*/
+void 		kill_childs(t_din	*din_table)
+{
+	int i;
+	int j;
+	int status;
+
+	i = 0;
+	while (i < din_table->nop)
+	{
+		j = 0;
+		waitpid(-1, &status, 0);
+		if (WIFEXITED(status) || WIFSIGNALED(status))
+			while (j < din_table->nop)
+				kill(din_table->philos[j++]->fpid, SIGKILL);
+		i++;
+	}
+	return ;
 }
 
 /*
@@ -99,37 +117,26 @@ void 	*mr_mayhem(void	*data)
 int			start_threads(t_din	*din_table)
 {
 	int i;
-	pthread_t *myhem;
+	int pid;
 
 	i = 0;
-	myhem = (pthread_t *)malloc(sizeof(pthread_t) * din_table->nop);
-	if (myhem == NULL)
-		return (ERROR);
 	din_table->st = ft_time_in_ms();
 	while (i < din_table->nop)
 	{
-		if (pthread_create(&din_table->philos[i]->thd_philo, NULL, &start_routine,
-			(void *)din_table->philos[i]) != 0)
-				return (ERROR);
-		i++;
+		pid = fork();
+		din_table->philos[i]->fpid = pid;
+		if (pid == 0)
+		{
+			if (pthread_create(&din_table->myhem[i], NULL, &mr_mayhem,
+				(void *)din_table->philos[i]) != 0)
+					return (ERROR);
+			start_routine(din_table->philos[i]);
+			exit(1);
+		}
 		usleep(100);
-	}
-	i = 0;
-	while (i < din_table->nop)
-	{
-		if (pthread_create(&myhem[i], NULL, &mr_mayhem,
-			(void *)din_table->philos[i]) != 0)
-				return (ERROR);
 		i++;
 	}
-	i = 0;
-	while (din_table->death);
-	while (i < din_table->nop)
-	{
-		if (pthread_detach(din_table->philos[i]->thd_philo) != 0)
-				return (ERROR);
-		i++;
-	}
+	kill_childs(din_table);
 	return (GOOD);
 }
 

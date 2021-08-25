@@ -6,11 +6,11 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 10:24:51 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 10:11:31 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/25 08:48:59 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 /*
 ** Print status using a write mutex
@@ -19,10 +19,17 @@
 */
 void    print_status(t_din  *din_table, int pid, char *string)
 {
-  pthread_mutex_lock(&din_table->write);
-  printf("%lld %d %s", ft_time_in_ms() - din_table->st, pid + 1, string);
+  sem_wait(din_table->write);
+  (void)pid;
+  (void)din_table;
+  ft_putnbr_fd(ft_time_in_ms() - din_table->st, 1);
+  write(1, " ", 1);
+  ft_putnbr_fd(pid + 1, 1);
+  write(1, " ", 1);
+  write(1, string, strlen(string));
+  // printf("%lld %d %s", ft_time_in_ms() - din_table->st, pid + 1, string);
   if (string[0] != 'd')
-    pthread_mutex_unlock(&din_table->write);
+    sem_post(din_table->write);
 }
 /*
 ** Philosopher get both forks then start eating
@@ -30,17 +37,17 @@ void    print_status(t_din  *din_table, int pid, char *string)
 */
 void  eat_routine(t_philo *philo)
 {
-  pthread_mutex_lock(&philo->din_table->forks[philo->lf]);
+  sem_wait(philo->din_table->forks);
   print_status(philo->din_table, philo->pid, "taken left fork\n");
-  pthread_mutex_lock(&philo->din_table->forks[philo->rf]);
+  sem_wait(philo->din_table->forks);
   print_status(philo->din_table, philo->pid, "taken right fork\n");
   philo->eating = 1;
   philo->lta = ft_time_in_ms();
   print_status(philo->din_table, philo->pid, "is eating\n");
   usleep(philo->din_table->tte * 1000);
   philo->nta++;
-  pthread_mutex_unlock(&philo->din_table->forks[philo->lf]);
-  pthread_mutex_unlock(&philo->din_table->forks[philo->rf]);
+  sem_post(philo->din_table->forks);
+  sem_post(philo->din_table->forks);
   philo->eating = 0;
   return ;
 }
@@ -75,7 +82,7 @@ void  *start_routine(void *data)
 
   philo = (t_philo *)data;
   philo->lta = ft_time_in_ms();
-  while (philo->din_table->death)
+  while (1)
   {
     eat_routine(philo);
     sleep_routine(philo);
