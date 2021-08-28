@@ -6,19 +6,19 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/18 16:38:13 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/23 10:12:31 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/27 20:37:22 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 /*
-** Mainly check arguments validity and return acceptance
-** In case of an error a -1 is returned
-*/
-int		check_arg_validity(int argSize, char **args)
+ ** Mainly check arguments validity and return acceptance
+ ** In case of an error a -1 is returned
+ */
+int	check_arg_validity(int argSize, char **args)
 {
-	int 	i;
+	int	i;
 
 	i = 1;
 	if (argSize - 1 < ARGVALUE || argSize - 1 > 6)
@@ -33,10 +33,10 @@ int		check_arg_validity(int argSize, char **args)
 }
 
 /*
-** Parse arguments into a valid struct
-** Which we will use later
-*/
-t_din		*fill_table(int argSize, char **args)
+ ** Parse arguments into a valid struct
+ ** Which we will use later
+ */
+t_din	*fill_table(int argSize, char **args)
 {
 	t_din	*din_table;
 	int		counter;
@@ -53,12 +53,6 @@ t_din		*fill_table(int argSize, char **args)
 	din_table->death = 1;
 	if (argSize - 1 == 5)
 		din_table->ntpme = ft_atoi(args[counter]);
-	if (din_table->nop == OFLOW || din_table->ttd == OFLOW || din_table->tte == OFLOW || din_table->tts == OFLOW ||
-		din_table->ntpme == OFLOW)
-	{
-		write(2, "Error: Invalid Argument\n", 23);
-		return (NULL);
-	}
 	din_table->forks = initialize_forks(din_table);
 	if (din_table->forks == NULL)
 		return (NULL);
@@ -71,73 +65,70 @@ t_din		*fill_table(int argSize, char **args)
 }
 
 /*
-** Mr mayhem check for a reason to kill
-** one of the philospher either their
-** time to die or number_of_times_each_philosopher_must_eat
-** Each philosopher has it's own death master
-*/
-void 	*mr_mayhem(void	*data)
+ ** Mr mayhem check for a reason to kill
+ ** one of the philospher either their
+ ** time to die or number_of_times_each_philosopher_must_eat
+ ** Each philosopher has it's own death master
+ */
+void	*mr_mayhem(void *data)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)data;
 	while (philo->din_table->death)
 	{
-			if (!philo->eating && ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
-			{
-				print_status(philo->din_table, philo->pid, "died\n");
-				philo->din_table->death = 0;
-			}
-			if (philo->din_table->philos[philo->din_table->nop - 1]->nta == philo->din_table->ntpme)
-					philo->din_table->death = 0;
+		if (!philo->is_eating
+			&& ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
+		{
+			pthread_mutex_lock(&philo->eating);
+			print_status(philo->din_table, philo->pid, "died\n");
+			philo->din_table->death = 0;
+			pthread_mutex_unlock(&philo->eating);
+		}
+		if (philo->din_table->philos[philo->din_table->nop - 1]->nta
+			== philo->din_table->ntpme)
+			philo->din_table->death = 0;
+		usleep(100);
 	}
 	return (NULL);
 }
 
 /*
-** Initialize threads and start philospher
-*/
-int			start_threads(t_din	*din_table)
+ ** Initialize threads and start philospher
+ */
+int	start_threads(t_din *din_table)
 {
-	int i;
-	pthread_t *myhem;
+	int	i;
 
 	i = 0;
-	myhem = (pthread_t *)malloc(sizeof(pthread_t) * din_table->nop);
-	if (myhem == NULL)
-		return (ERROR);
 	din_table->st = ft_time_in_ms();
 	while (i < din_table->nop)
 	{
-		if (pthread_create(&din_table->philos[i]->thd_philo, NULL, &start_routine,
-			(void *)din_table->philos[i]) != 0)
-				return (ERROR);
+		din_table->philos[i]->lta = ft_time_in_ms();
+		if (pthread_create(&din_table->philos[i]->thd_philo, NULL,
+			&start_routine, (void *)din_table->philos[i]) != 0)
+			return (ERROR);
 		i++;
 		usleep(100);
 	}
 	i = 0;
 	while (i < din_table->nop)
 	{
-		if (pthread_create(&myhem[i], NULL, &mr_mayhem,
-			(void *)din_table->philos[i]) != 0)
-				return (ERROR);
+		if (pthread_create(&din_table->philos[i]->myhem, NULL, &mr_mayhem,
+		(void *)din_table->philos[i]) != 0)
+			return (ERROR);
+		usleep(100);
 		i++;
 	}
-	i = 0;
-	while (din_table->death);
-	while (i < din_table->nop)
-	{
-		if (pthread_detach(din_table->philos[i]->thd_philo) != 0)
-				return (ERROR);
-		i++;
-	}
+	while (din_table->death)
+		continue ;
 	return (GOOD);
 }
 
-int		main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_din		*din_table;
-	int			p_counter;
+	t_din	*din_table;
+	int		p_counter;
 
 	p_counter = 0;
 	din_table = NULL;
