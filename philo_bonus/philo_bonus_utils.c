@@ -6,7 +6,7 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 09:26:02 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/25 08:27:51 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/28 09:41:49 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,13 @@ t_philo   **initialize_philosphers(t_din *din_table)
 		philos[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
 		if (philos[i] == NULL)
 			return (NULL);
+		sem_unlink("eating");
+		philos[i]->eating = sem_open("eating", O_CREAT, 0644, 1);
+		if (din_table->write == SEM_FAILED)
+			return (NULL);
     philos[i]->din_table = din_table;
     philos[i]->pid = i;
     philos[i]->nta = 0;
-    philos[i]->eating = 0;
     i++;
   }
   return (philos);
@@ -106,6 +109,12 @@ t_philo   **initialize_philosphers(t_din *din_table)
 */
 int 	initialize_sems(t_din *din_table)
 {
+	if (din_table->nop == OFLOW || din_table->ttd == OFLOW || din_table->tte
+		== OFLOW || din_table->tts == OFLOW || din_table->ntpme == OFLOW)
+	{
+		write(2, "Error: Argument overflow\n", 23);
+		return (NULL);
+	}
 	sem_unlink("forking");
   din_table->forks = sem_open("forking", O_CREAT, S_PERM, din_table->nop);
   if (din_table->forks == SEM_FAILED)
@@ -118,8 +127,9 @@ int 	initialize_sems(t_din *din_table)
 	din_table->write = sem_open("writing", O_CREAT, 0644, 1);
 	if (din_table->write == SEM_FAILED)
 		return (ERROR);
-	din_table->myhem = (pthread_t *)malloc(sizeof(pthread_t) * din_table->nop);
-	if (din_table->myhem == NULL)
+	sem_unlink("eatcounter");
+	din_table->eat = sem_open("eatcounter", O_CREAT, 0644, 1);
+	if (din_table->eat == SEM_FAILED)
 		return (ERROR);
   return (GOOD);
 }

@@ -6,19 +6,19 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/18 16:38:13 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/25 08:50:04 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/28 09:43:48 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
 /*
-** Mainly check arguments validity and return acceptance
-** In case of an error a -1 is returned
-*/
-int		check_arg_validity(int argSize, char **args)
+ ** Mainly check arguments validity and return acceptance
+ ** In case of an error a -1 is returned
+ */
+int	check_arg_validity(int argSize, char **args)
 {
-	int 	i;
+	int	i;
 
 	i = 1;
 	if (argSize - 1 < ARGVALUE || argSize - 1 > 6)
@@ -33,10 +33,10 @@ int		check_arg_validity(int argSize, char **args)
 }
 
 /*
-** Parse arguments into a valid struct
-** Which we will use later
-*/
-t_din		*fill_table(int argSize, char **args)
+ ** Parse arguments into a valid struct
+ ** Which we will use later
+ */
+t_din	*fill_table(int argSize, char **args)
 {
 	t_din	*din_table;
 	int		counter;
@@ -52,12 +52,6 @@ t_din		*fill_table(int argSize, char **args)
 	din_table->ntpme = -1;
 	if (argSize - 1 == 5)
 		din_table->ntpme = ft_atoi(args[counter]);
-	if (din_table->nop == OFLOW || din_table->ttd == OFLOW || din_table->tte == OFLOW || din_table->tts == OFLOW ||
-		din_table->ntpme == OFLOW)
-	{
-		write(2, "Error: Argument overflow\n", 23);
-		return (NULL);
-	}
 	if (initialize_sems(din_table) != GOOD)
 		return (NULL);
 	din_table->philos = initialize_philosphers(din_table);
@@ -67,36 +61,14 @@ t_din		*fill_table(int argSize, char **args)
 }
 
 /*
-** Mr mayhem check for a reason to kill
-** one of the philospher either their
-** time to die or number_of_times_each_philosopher_must_eat
-*/
-void 	*mr_mayhem(void	*data)
+ ** Await for child to finish
+ ** Then automatically kill them
+ */
+void	childs_reaper(t_din *din_table)
 {
-	t_philo *philo;
-
-	philo = (t_philo *)data;
-	usleep(3000);
-	while (1)
-	{
-			if (ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
-			{
-				print_status(philo->din_table, philo->pid, "died\n");
-				exit(1);
-			}
-	}
-	return (NULL);
-}
-
-/*
-** Await for child to finish
-** Then automatically kill them
-*/
-void 		kill_childs(t_din	*din_table)
-{
-	int i;
-	int j;
-	int status;
+	int	i;
+	int	j;
+	int	status;
 
 	i = 0;
 	while (i < din_table->nop)
@@ -112,35 +84,37 @@ void 		kill_childs(t_din	*din_table)
 }
 
 /*
-** Initialize threads and start philospher
-*/
-int			start_threads(t_din	*din_table)
+ ** Initialize threads and start philospher
+ */
+int	start_threads(t_din *din_table)
 {
-	int i;
-	int pid;
+	int	i;
 
 	i = 0;
+	if (din_table->ntpme != ERROR && pthread_create(&din_table->eatcounter,
+		NULL, &eat_reaper, (void *)din_table) != 0)
+		return (ERROR);
 	din_table->st = ft_time_in_ms();
 	while (i < din_table->nop)
 	{
-		pid = fork();
-		din_table->philos[i]->fpid = pid;
-		if (pid == 0)
+		din_table->philos[i]->fpid = fork();
+		din_table->philos[i]->lta = ft_time_in_ms();
+		if (din_table->philos[i]->fpid == 0)
 		{
-			if (pthread_create(&din_table->myhem[i], NULL, &mr_mayhem,
+			if (pthread_create(&din_table->philos[i]->myhem, NULL, &mr_mayhem,
 				(void *)din_table->philos[i]) != 0)
-					return (ERROR);
+				return (ERROR);
 			start_routine(din_table->philos[i]);
 			exit(1);
 		}
 		usleep(100);
 		i++;
 	}
-	kill_childs(din_table);
+	childs_reaper(din_table);
 	return (GOOD);
 }
 
-int		main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	t_din		*din_table;
 	int			p_counter;
