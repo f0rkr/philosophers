@@ -6,13 +6,13 @@
 /*   By: mashad <mashad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 09:26:02 by mashad            #+#    #+#             */
-/*   Updated: 2021/08/28 09:41:49 by mashad           ###   ########.fr       */
+/*   Updated: 2021/08/28 10:20:38 by mashad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-int		ft_check(unsigned long pt, int s)
+int	ft_check(unsigned long pt, int s)
 {
 	if (pt > 9223372036854775807 && s == -1)
 		return (0);
@@ -21,7 +21,7 @@ int		ft_check(unsigned long pt, int s)
 	return (pt * s);
 }
 
-int		ft_atoi(const char *str)
+int	ft_atoi(const char *str)
 {
 	unsigned long long int	j;
 	unsigned long long int	t_p;
@@ -48,47 +48,33 @@ int		ft_atoi(const char *str)
 	return (ft_check(t_p, tt));
 }
 
-/* Mainly check if the in string
-** doesn't contain any ascii than numbers
-*/
-int   ft_is_number(char *string)
+/*
+ ** Get the current time in ms
+ */
+long long	ft_time_in_ms(void)
 {
-  int   i;
+	struct timeval	te;
+	long long		milliseconds;
 
-  i = 0;
-  while (string[i] != EOL)
-  {
-    if (string[i] <= '0' || string[i] >= '9')
-      return (ERROR);
-    i++;
-  }
-  return (GOOD);
+	gettimeofday(&te, NULL);
+	milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000;
+	return (milliseconds);
 }
 
 /*
-** Get the current time in ms
-*/
-long long ft_time_in_ms() {
-    struct timeval te;
-    gettimeofday(&te, NULL);
-    long long milliseconds = te.tv_sec*1000LL + te.tv_usec/1000;
-    return milliseconds;
-}
-
-/*
-** Initialize philosophers struct
-*/
-t_philo   **initialize_philosphers(t_din *din_table)
+ ** Initialize philosophers struct
+ */
+t_philo	**initialize_philosphers(t_din *din_table)
 {
-  t_philo  **philos;
-  int      i;
+	t_philo	**philos;
+	int		i;
 
-  i = 0;
-  philos = (t_philo **)malloc(sizeof(t_philo *) * din_table->nop + 1);
-  if (philos == NULL)
-    return (NULL);
-  while (i < din_table->nop)
-  {
+	i = 0;
+	philos = (t_philo **)malloc(sizeof(t_philo *) * din_table->nop + 1);
+	if (philos == NULL)
+		return (NULL);
+	while (i < din_table->nop)
+	{
 		philos[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
 		if (philos[i] == NULL)
 			return (NULL);
@@ -96,29 +82,29 @@ t_philo   **initialize_philosphers(t_din *din_table)
 		philos[i]->eating = sem_open("eating", O_CREAT, 0644, 1);
 		if (din_table->write == SEM_FAILED)
 			return (NULL);
-    philos[i]->din_table = din_table;
-    philos[i]->pid = i;
-    philos[i]->nta = 0;
-    i++;
-  }
-  return (philos);
+		philos[i]->din_table = din_table;
+		philos[i]->pid = i;
+		philos[i]->nta = 0;
+		i++;
+	}
+	return (philos);
 }
 
 /*
-** Initialize forks semaphores
-*/
-int 	initialize_sems(t_din *din_table)
+ ** Initialize forks semaphores
+ */
+int	initialize_sems(t_din *din_table)
 {
 	if (din_table->nop == OFLOW || din_table->ttd == OFLOW || din_table->tte
 		== OFLOW || din_table->tts == OFLOW || din_table->ntpme == OFLOW)
 	{
 		write(2, "Error: Argument overflow\n", 23);
-		return (NULL);
+		return (ERROR);
 	}
 	sem_unlink("forking");
-  din_table->forks = sem_open("forking", O_CREAT, S_PERM, din_table->nop);
-  if (din_table->forks == SEM_FAILED)
-    return (ERROR);
+	din_table->forks = sem_open("forking", O_CREAT, 0644, din_table->nop);
+	if (din_table->forks == SEM_FAILED)
+		return (ERROR);
 	sem_unlink("death");
 	din_table->death = sem_open("death", O_CREAT, 0644, 1);
 	if (din_table->death == SEM_FAILED)
@@ -131,5 +117,5 @@ int 	initialize_sems(t_din *din_table)
 	din_table->eat = sem_open("eatcounter", O_CREAT, 0644, 1);
 	if (din_table->eat == SEM_FAILED)
 		return (ERROR);
-  return (GOOD);
+	return (GOOD);
 }
